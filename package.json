@@ -1,0 +1,29 @@
+{
+  "name": "manablox-service-graphql",
+  "description": "GraphQL service module for manablox",
+  "version": "1.0.0",
+  "repository": "https://github.com/manablox/manablox-service-graphql.git",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "release": "standard-version; git push --follow-tags origin master; npm publish"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "dependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "body-parser": "^1.19.0",
+    "commitizen": "^4.0.3",
+    "husky": "^3.1.0",
+    "standard-version": "^7.0.1"
+  }
+}
