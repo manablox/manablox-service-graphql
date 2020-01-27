@@ -1,0 +1,8 @@
+type Query {
+    Pagecomponents: [Pagecomponent]
+}
+
+type Pagecomponent {
+    _id: ID
+    username: String
+}

@@ -1,39 +1,74 @@
-import { ApolloServer } from 'apollo-server'
+import { ApolloServer, addMockFunctionsToSchema } from 'apollo-server-express'
 import { GraphQLModule } from '@graphql-modules/core'
 import gql from 'graphql-tag'
 
+import CreateGraphModule from './utils/CreateGraphModule'
+import Router from './router'
 
 
-const { schema } = new GraphQLModule({
-    typeDefs: gql`
-        type Query {
-            Posts: [Post]
-        }
+let graphs = []
+const graphFiles = require.context('./graphs', true, /index\.js$/)
+graphFiles.keys().map((key) => { graphs.push({ name: key.split('/').reverse()[1], module: graphFiles(key).default }) })
 
-        type Post {
-            id: ID
-        }
-    `
-})
+graphs = graphs.filter((graph) => { return graph.module.autoload == true })
 
 class GraphQLService {
     constructor(config){
         this.config = config
         this.server = this.config.server
-        this.apollo = new ApolloServer({
-            schema
-        })
+        
+        this.apollo = null
+        this.graphRouter = null
+
+        this.middleware = null
+
+        this.runtimeModules = []
+
+        this.contextData = {}
+
+        this.graphRouter = new Router(this, graphs)
     }
 
     async Start(){
-        // this.server.Use(this.config.prefix, this.Middleware)
+        let mainModule = new GraphQLModule({
+            imports: [
+                ...this.graphRouter.Modules,
+                ...this.runtimeModules
+            ]
+        })
+
+        this.apollo = undefined
+
+        this.apollo = new ApolloServer({
+            introspection: true,
+            schema: mainModule.schema,
+            debug: process.env.NODE_ENV !== 'production',
+            context: ({ req }) => {
+                return { req, ...this.contextData, ...mainModule.context }
+            }
+        })
+
+        this.middleware = this.apollo.getMiddleware({
+            path: this.config.prefix,
+            bodyParserConfig: { limit: '64mb' }
+        })
+
+        this.server.app.use((req, res, next) => {
+            return this.middleware(req, res, next)
+        })
     }
 
-    // get Middleware(){
-    //     return new ApolloServer({
-    //         schema: 
-    //     })
-    // }
+    SetContextData(data){
+        this.contextData = {
+            ...this.contextData,
+            ...data
+        }
+    }
+
+    AddGraphModule(graph){
+        this.runtimeModules.push(this.graphRouter.AddGraphModule(graph))
+        this.Start()
+    }
 }
 
 export default GraphQLService

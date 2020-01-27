@@ -1,14 +1,13 @@
 import ExpressService from 'manablox-service-express'
 import GraphQLService from '../index'
 
-import Router from 'manablox-service-express/router'
+import gql from 'graphql-tag'
 
 const server = new ExpressService({
     ip: '0.0.0.0',
     port: 3550
 })
 
-// const router = new Router(server)
 const graphql = new GraphQLService({
     prefix: '/graphql',
     server
@@ -17,6 +16,37 @@ const graphql = new GraphQLService({
 const StartServer = async () => {
     graphql.Start()
     server.Start()
+
+    setTimeout(() => {
+        graphql.SetContextData({ testing: true })
+    }, 2000)
+
+    setTimeout(() => {
+        let typeDefs = `
+            type Query {
+                Comments: [Comment]
+            }
+
+            type Comment {
+                _id: ID
+                name: String
+            }
+        `
+
+        let resolvers = {
+            Query: {
+                Comments(root, args, context, info){
+                    return []
+                }
+            }
+        }
+
+        graphql.AddGraphModule({
+            typeDefs: gql`${ typeDefs }`,
+            resolvers,
+
+        })
+    }, 4000)
 }
 
 StartServer()
