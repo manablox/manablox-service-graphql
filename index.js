@@ -6,11 +6,7 @@ import CreateGraphModule from './utils/CreateGraphModule'
 import Router from './router'
 
 
-let graphs = []
-const graphFiles = require.context('./graphs', true, /index\.js$/)
-graphFiles.keys().map((key) => { graphs.push({ name: key.split('/').reverse()[1], module: graphFiles(key).default }) })
 
-graphs = graphs.filter((graph) => { return graph.module.autoload == true })
 
 class GraphQLService {
     constructor(config){
@@ -26,7 +22,7 @@ class GraphQLService {
 
         this.contextData = {}
 
-        this.graphRouter = new Router(this, graphs)
+        this.graphRouter = new Router(this, config.graphs)
     }
 
     async Start(){
