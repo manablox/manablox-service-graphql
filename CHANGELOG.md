@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.2](https://github.com/manablox/manablox-service-graphql/compare/v1.3.1...v1.3.2) (2020-01-28)
+
+
+### Refactorings
+
+* using destructor for creating graph modules ([9568e4e](https://github.com/manablox/manablox-service-graphql/commit/9568e4e7ccb58d75a1a03c67f287901edeaaee16))
+
 ### [1.3.1](https://github.com/manablox/manablox-service-graphql/compare/v1.3.0...v1.3.1) (2020-01-28)
 
 
